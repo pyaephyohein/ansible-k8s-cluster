@@ -1,0 +1,53 @@
+---
+# - name: kubeadm reset
+#   become: true
+#   shell: kubeadm reset --force
+
+- name: initialize the cluster
+  become: true
+  shell: kubeadm init --pod-network-cidr=10.244.0.0/16
+  args:
+    chdir: $HOME
+    creates: cluster_initialized.txt
+
+- name: create .kube directory
+  become: true
+  file:
+    path: /home/{{user.name}}/.kube
+    state: directory
+    mode: 0755
+
+- name: copies admin.conf to user's kube config
+  become: true
+  copy:
+    src: /etc/kubernetes/admin.conf
+    dest: /home/{{user.name}}/.kube/config
+    remote_src: yes
+    owner: "{{user.name}}"
+
+- name: install Pod network
+  become: true
+  become_user: "{{user.name}}"
+  shell: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+  args:
+    chdir: $HOME
+    
+- name: Get the token for joining the worker nodes
+  become: true
+  become_user: "{{user.name}}"
+  shell: kubeadm token create  --print-join-command > /tmp/kubernetes_join_command
+
+
+- name: kubejoin-cmd to local
+  fetch:
+    src: /tmp/kubernetes_join_command
+    dest: /tmp/kubernetes_join_command
+    flat: yes
+    mode: 0777
+
+- name: copy kubeconfig to local
+  fetch:
+    src: /home/{{user.name}}/.kube/config
+    dest: /tmp/kubeconfig
+    flat: yes
+    mode: 0777 

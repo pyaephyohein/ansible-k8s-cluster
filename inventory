@@ -1,0 +1,8 @@
+[master]
+hostname=master1 ansible_ssh_host= ansible_user=
+
+[workers]
+hostname=worker1 ansible_ssh_host= ansible_user=
+
+
+

@@ -1,0 +1,17 @@
+---
+- name: Add kubernetes signed GPG key to Install
+  become: true
+  shell: curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add
+
+- name: Add Software Repositories
+  become: true
+  shell: sudo apt-add-repository "deb http://apt.kubernetes.io/ kubernetes-xenial main"
+
+- name: Install Tools
+  become: true
+  apt: name={{ item }} update_cache=yes state=latest
+  loop: 
+    - kubeadm
+    - kubelet
+    - kubectl
+    

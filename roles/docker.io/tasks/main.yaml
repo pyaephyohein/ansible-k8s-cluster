@@ -1,0 +1,11 @@
+---
+  - name: Install Docker.io
+    become: true
+    apt: name=docker.io update_cache=yes state=latest
+
+  - name: Enable Docker Service
+    become: true
+    shell: systemctl enable docker
+  - name: Restart Docker Service 
+    become: true
+    shell: systemctl restart docker

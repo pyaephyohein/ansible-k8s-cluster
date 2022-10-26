@@ -1,0 +1,20 @@
+- hosts: all
+  become_user: root
+
+  roles:
+    - { role: apt, tags: 'apt' }
+    - { role: docker.io, tags: 'docker.io' }
+    - { role: kubernetes, tags: 'kubernetes'}
+    - { role: swapoff, tags: 'swapoff'}
+
+- hosts: master
+  become_user: root
+
+  roles:
+   - { role: create-cluster, tags: 'create-cluster'}
+
+- hosts: workers
+  become_user: root
+
+  roles:
+   - { role: join-cluster, tags: 'join-cluster'}
