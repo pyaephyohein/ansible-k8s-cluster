@@ -1,5 +1,12 @@
 ---
+- name: Check cluster joined or not
+  become: true
+  stat:
+    path: /etc/kubernetes/pki/ca.crt
+  register: already_joined
+
 - name: Copy join command from Ansiblehost to the worker nodes.
+  when:  already_joined.stat.exists == False
   become: true
   copy:
     src: /tmp/kubernetes_join_command
@@ -7,6 +14,7 @@
     mode: 0777
 
 - name: Join the Worker nodes to the cluster.
+  when:  already_joined.stat.exists == False
   become: true
   command: sh /tmp/kubernetes_join_command
   register: joined_or_not

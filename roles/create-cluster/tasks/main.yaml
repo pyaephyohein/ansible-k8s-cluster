@@ -1,9 +1,12 @@
 ---
-# - name: kubeadm reset
-#   become: true
-#   shell: kubeadm reset --force
+- name: Check cluster cretaed or not
+  become: true
+  stat:
+    path: /etc/kubernetes/manifests/kube-apiserver.yaml
+  register: already_created
 
 - name: initialize the cluster
+  when:  already_created.stat.exists == False
   become: true
   shell: kubeadm init --pod-network-cidr=10.244.0.0/16
   args:
@@ -11,6 +14,7 @@
     creates: cluster_initialized.txt
 
 - name: create .kube directory
+  when:  already_created.stat.exists == False
   become: true
   file:
     path: /home/{{user.name}}/.kube
@@ -18,6 +22,7 @@
     mode: 0755
 
 - name: copies admin.conf to user's kube config
+  when:  already_created.stat.exists == False
   become: true
   copy:
     src: /etc/kubernetes/admin.conf
@@ -26,6 +31,7 @@
     owner: "{{user.name}}"
 
 - name: install Pod network
+  when:  already_created.stat.exists == False
   become: true
   become_user: "{{user.name}}"
   shell: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
