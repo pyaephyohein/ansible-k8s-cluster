@@ -1,0 +1,6 @@
+- name: Install helm
+  become: true
+  snap:
+    name: helm
+    classic: true
+    state: present

@@ -11,12 +11,21 @@
   become_user: root
 
   roles:
+   - { role: snap, tags: 'snap'}
    - { role: create-cluster, tags: 'create-cluster'}
    - { role: metallb, tags: 'metallb'}
    - { role: nginx-ingress, tags: 'nginx-ingress'}
+   - { role: longhorn, tags: 'longhorn'}
 
 - hosts: workers
   become_user: root
 
   roles:
    - { role: join-cluster, tags: 'join-cluster'}
+
+
+- hosts: master
+  become_user: root
+
+  roles:
+   - { role: argocd, tags: 'argocd'}

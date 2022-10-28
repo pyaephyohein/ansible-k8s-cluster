@@ -1,0 +1,4 @@
+---
+- name: Deploy longhorn
+  shell: kubectl apply -f https://raw.githubusercontent.com/longhorn/longhorn/master/deploy/longhorn.yaml
+  ignore_errors: true
