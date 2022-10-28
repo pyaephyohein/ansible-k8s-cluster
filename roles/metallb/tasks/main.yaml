@@ -1,0 +1,33 @@
+- name: Copy metal-lb-config
+  become: true
+  copy:
+    src: roles/metallb/files/metallb-config.yaml
+    dest: /tmp/metallb-config.yaml 
+    mode: 0777
+- name: apply-ip-address
+  become: true
+  ansible.builtin.replace:
+    path: /tmp/metallb-config.yaml
+    regexp: 0.0.0.0
+    replace: "{{ metallb.ip }}"
+- name: Create metallb-system namespace 
+  kubernetes.core.k8s:
+    name: metallb-system
+    api_version: v1
+    kind: Namespace
+    state: present
+# - name: Download metallb manifest to the cluster.
+#   ansible.builtin.get_url:
+#     url: https://raw.githubusercontent.com/metallb/metallb/v0.12.1/manifests/metallb.yaml
+#     dest: /tmp/metallb.yaml
+#     mode: '0664'
+# - name: Deploy metllb-system
+#   kubernetes.core.k8s:
+#     state: present
+#     src: /tmp/metallb.yaml
+
+- name: Kubectl apply metallb
+  shell: kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.12.1/manifests/metallb.yaml
+  ignore_errors: true
+- name: metall ip deploy 
+  shell: kubectl apply -f /tmp/metallb-config.yaml

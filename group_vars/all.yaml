@@ -1,5 +1,12 @@
 apt:
   update: true
   upgrade: true
+  
 user:
   name: pph
+
+metallb:
+  ip: 192.168.8.111/32
+
+ingress:
+  host: mgou.home

@@ -15,3 +15,6 @@
     - kubelet
     - kubectl
     
+- name: install python module
+  become_user: root
+  command: pip3 install kubernetes
