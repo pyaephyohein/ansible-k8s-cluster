@@ -1,9 +1,7 @@
 [master]
-hostname=master1 ansible_ssh_host=192.168.8.111 ansible_user=pph
+hostname=master1 ansible_ssh_host=192.168.8.111 ansible_user=pph ansible_ssh_pass=pph
 
 [workers]
-hostname=worker1 ansible_ssh_host=192.168.8.112 ansible_user=pph
-hostname=worker2 ansible_ssh_host=192.168.8.113 ansible_user=pph
-
+hostname=worker1 ansible_ssh_host=192.168.8.112 ansible_user=pph ansible_ssh_pass=pph
 
 

@@ -1,0 +1,52 @@
+---
+- name: Copy loki value.yaml
+  become: true
+  copy:
+    src: roles/monitoring/files/loki-value.yaml
+    dest: /tmp/loki-value.yaml
+    mode: 0777
+- name: Helm Repo add loki-stack
+  kubernetes.core.helm_repository:
+    name: grafana
+    url: https://grafana.github.io/helm-charts
+
+- name: Create a k8s namespace
+  kubernetes.core.k8s:
+    name: monitoring
+    api_version: v1
+    kind: Namespace
+    state: present
+
+- name: Deploy Loki helm chart
+  block:
+    - name: helm upgrade loki
+      become_user: root
+      shell: helm upgrade loki grafana/loki-stack --namespace monitoring --values /tmp/loki-value.yaml
+  rescue:
+    - name: helm deploy loki
+      become_user: root
+      shell: helm install loki grafana/loki-stack --namespace monitoring --values /tmp/loki-value.yaml
+
+- name: Copy loki value.yaml
+  become: true
+  copy:
+    src: roles/monitoring/files/grafana-value.yaml
+    dest: /tmp/grafana-value.yaml
+    mode: 0777
+
+- name: Apply grafana ingress
+  become: true
+  ansible.builtin.replace:
+    path: /tmp/grafana-value.yaml
+    regexp: grafana.example.local
+    replace: grafana.{{ingress.host}}
+
+- name: Deploy Grafana helm chart
+  block:
+    - name: helm upgrade grafana
+      become_user: root
+      shell: helm upgrade grafana grafana/grafana --namespace monitoring --values /tmp/grafana-value.yaml
+  rescue:
+    - name: helm deploy grafana
+      become_user: root
+      shell: helm install grafana grafana/grafana --namespace monitoring --values /tmp/grafana-value.yaml

@@ -1,0 +1,11 @@
+---
+- name: Copy nfs config .yaml
+  become: true
+  copy:
+    src: roles/nfs-sc/files/nfs.yaml
+    dest: /tmp/nfs.yaml
+    mode: 0777
+- name: Deploy nfs-system
+  kubernetes.core.k8s:
+    state: present
+    src: /tmp/nfs.yaml
