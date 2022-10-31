@@ -19,7 +19,15 @@ loki:
   datasource:
     jsonData: {}
     uid: ""
-
+  config:
+    storage_config:
+      aws:
+        s3: http://pyaephyohein:pyaephyohein@192.168.8.102:9000/loki
+        s3forcepathstyle: true
+        sse_encryption: false
+      boltdb_shipper:
+        shared_store: s3
+        cache_ttl: 48h
 
 promtail:
   enabled: true
